@@ -12,7 +12,7 @@ function Modal({ title, content, btnText, btnFunc }) {
       <div className="w-full bg-white shadow-lg rounded-md p-4 ">
         <div className="border-b py-3 flex items-center justify-between">
           <div className="text-2xl">{title}</div>
-          <IoMdClose onClick={closeModal} size={24} />
+          <IoMdClose className="cursor-pointer" onClick={closeModal} size={24} />
         </div>
         {content}
       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { useSelector } from "react-redux";
 import Modal from "../components/modal/Modal";
@@ -7,19 +7,28 @@ import Button from "../components/Button";
 import { useDispatch } from "react-redux";
 import { createDataFunc } from "../redux/dataSlice";
 import { modalFunc } from "../redux/modalSlice";
+import { useLocation } from "react-router-dom";
 function Products() {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const { modal } = useSelector((state) => state.modal);
+  const { data } = useSelector((state) => state.data);
+  const loc = location && location.search.split("=")[1];
   const buttonFunc = () => {
-    dispatch(createDataFunc(productInsfo));
+    dispatch(createDataFunc({ ...productInsfo, id: data.length + 1 }));
     dispatch(modalFunc());
   };
+  useEffect(() => {
+    if (loc) {
+      setProductInfo(data.find((dt) => dt.id === loc.id));
+    }
+  }, [loc, data]);
   const [productInsfo, setProductInfo] = useState({
     name: "",
     price: "",
     url: "",
   });
-  const { modal } = useSelector((state) => state.modal);
-  const { data } = useSelector((state) => state.data);
+
   const onChangeFunc = (e, type) => {
     e.preventDefault();
     if (type === "url") {
@@ -41,6 +50,7 @@ function Products() {
   const modalContent = (
     <>
       <Input
+        value={productInsfo && productInsfo.name}
         type={"text"}
         placeholder={"Məhsul əlavə et"}
         name={"name"}
@@ -48,6 +58,7 @@ function Products() {
         onChange={(e) => onChangeFunc(e, "name")}
       />
       <Input
+        value={productInsfo && productInsfo.price}
         type={"text"}
         placeholder={"Qiymət əlavə et"}
         name={"price"}
@@ -61,13 +72,13 @@ function Products() {
         id={"url"}
         onChange={(e) => onChangeFunc(e, "url")}
       />
-      <Button btnText={"Əlavə et"} onClick={buttonFunc} />
+      <Button btnText={loc ? "Yenilə" : "Əlavə et"} onClick={buttonFunc} />
     </>
   );
 
   return (
     <div>
-      <div>
+      <div className="p-4">
         {data?.map((item, index) => (
           <ProductCard item={item} key={index} />
         ))}
